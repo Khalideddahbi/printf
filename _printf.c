@@ -1,13 +1,12 @@
-#include "main.h"
 #include <unistd.h>
 #include <stdarg.h>
+#include "main.h"
 #include <stdio.h>
-
 /**
  * _printf - printf function
- * @format: Format
+ * @format: Format string
  *
- * Return: Number of characters printed
+ * Return: Number of char
  */
 int _printf(const char *format, ...)
 {
@@ -15,22 +14,6 @@ int _printf(const char *format, ...)
 	int char_count = 0;
 
 	va_start(args, format);
-	char_count = _print_format(format, args);
-	va_end(args);
-
-	return (char_count);
-}
-
-/**
- * _print_format - Print formatted
- * @format: Format string
- * @args: Variables
- *
- * Return: Number of char
- */
-int _print_format(const char *format, va_list args)
-{
-	int char_count = 0;
 
 	while (*format)
 	{
@@ -41,53 +24,31 @@ int _print_format(const char *format, va_list args)
 		else
 		{
 			format++;
+			if (*format == '\0')
+				break;
 			if (*format == 'c')
-				char_count += _print_char(va_arg(args, int));
+			{
+				char c = va_arg(args, int);
+
+				char_count += write(1, &c, 1);
+			}
 			else if (*format == 's')
-				char_count += _print_string(va_arg(args, char *));
+			{
+				char *str = va_arg(args, char *);
+
+				if (str == NULL)
+					str = "(null)";
+				while (*str)
+				{
+					char_count += write(1, str, 1);
+					str++;
+				}
+			}
 			else if (*format == '%')
 				char_count += write(1, "%", 1);
 		}
 		format++;
 	}
+	va_end(args);
 	return (char_count);
-}
-
-/**
- * _print_char - Print a char
- * @c: Character to print
- *
- * Return: Number of characters
- */
-int _print_char(char c)
-{
-	return (write(1, &c, 1));
-}
-
-/**
- * _print_string - Print a string
- * @s: String to print
- *
- * Return: Number of characters
- */
-int _print_string(char *s)
-{
-	if (!s)
-		s = "(null)";
-	return (write(1, s, _strlen(s)));
-}
-
-/**
- * _strlen - Calculate the length
- * @s: The input
- *
- * Return: Length
- */
-int _strlen(char *s)
-{
-	int len = 0;
-
-	while (*s++)
-		len++;
-	return (len);
 }
